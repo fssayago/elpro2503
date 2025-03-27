@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Books</title>
+    </head>
+    <body>
+
+        <h1>Add a book</h1>
+        <form method='POST' action='/'>
+            <input type="text" name="book">
+            <input type="submit">
+        </form>
+
+        <h1>Books</h1>
+        <ul>
+        {% for book in products %}
+            <li>
+            {{book.email}}
+            </li>
+        {% endfor %}
+        </ul>
+    </body>
+</html>

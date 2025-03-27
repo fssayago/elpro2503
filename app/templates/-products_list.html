@@ -1,0 +1,147 @@
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Página de Tabaco</title>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='estilos.css') }}">
+
+</head>
+<body>
+  <header>
+    <h1>Bienvenido a Mi Tienda de Tabaco</h1>
+  </header>
+  <nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#productos">Productos</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+ 
+ /*extends 'products_list.html'*/
+   <div class="col-sm-12">
+        <div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+        </div>
+
+  {% if 'carro_item' in session %}
+
+	<h1><center>Productos del Carro</center></h1>	  
+	<p><a id="btnEmpty" href="{{ url_for('.empty_cart') }}" class="btn btn-danger">Vaciar Carro</a></p>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th class="text-center">Precio Unitario</th>
+                        <th class="text-center">Sub Total</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+    {% for key, val in session['carro_item'].items() %}
+        {% set cantidad = session['carro_item'][key]['cantidad'] %}
+        {% set precio = session['carro_item'][key]['precio'] %}
+        {% set precio_total = session['carro_item'][key]['precio_total'] %} 
+                    <tr>
+                        <td class="col-sm-8 col-md-6">
+                        <div class="media">
+                            <a class="thumbnail pull-left" href="#"> <img class="media-object" src="/static/images/{{ session['carro_item'][key]['image'] }}" style="width: 72px; height: 72px;"> </a>
+                            <div class="media-body" style="padding-left:10px;">
+                                <h4 class="media-heading"> <a href="#">{{ session['carro_item'][key]['nombre'] }}</a></h4>
+                                <h5 class="media-heading"> by <a href="#">Brand name</a></h5>
+                                <span>Status: </span><span class="text-success"><strong>In Stock</strong></span>
+                            </div>
+                        </div></td>
+                        <td class="col-sm-1 col-md-1" style="text-align: center">
+                        <input type="cantidad" class="form-control" value="{{ session['carro_item'][key]['cantidad'] }}">
+                        </td>
+                        <td class="col-sm-1 col-md-1 text-center"><strong>${{ precio }} </strong></td>
+                        <td class="col-sm-1 col-md-1 text-center"><strong>${{ precio_total }} </strong></td>
+                        <td class="col-sm-1 col-md-1">
+                        <a href="{{ url_for('.delete_product', id=session['carro_item'][key]['id']) }}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-remove"></span> Remove
+                        </a></td>
+                    </tr>
+    {% endfor %}
+                    <tr>
+                        <td colspan="4"><h5>Cantidad Total</h5></td>
+                        <td class="text-right"><h5><strong>{{ session['t_cantidad_total'] }}</strong></h5></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><h3>Total</h3></td>
+                        <td colspan="2" class="text-right"><h3><strong>$ {{ session['t_precio_total'] }}</strong></h3></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                        <button type="button" class="btn btn-default">
+                            <span class="glyphicon glyphicon-shopping-cart"></span> Continue Shopping
+                        </button></td>
+                        <td>
+                        <button type="button" class="btn btn-success">
+                            Checkout <span class="glyphicon glyphicon-play"></span>
+                        </button></td>
+                    </tr>
+                </tbody>
+            </table>
+  {% else: %}
+   <div class="no-records">El Carro esta vacío</div>
+  {% endif %}
+    </div>
+	
+{% block content %}
+    <h1 class="title"><center>{% block title %} Lista de Productos {% endblock %}</center></h1>	
+  <div class="container">
+      <section id="productos" class="grid">
+        {% for item in products %}
+            <div class="product">
+				<form method="post" action="/add">			
+				<a href="templates/carrito.html">
+                <p>				
+				<h3>
+				<b>#{{ item.id }}</b>
+				</h3></p>
+				<img src="static/producto1.jpg" alt="{{ item.id }}">
+				</a>				
+                <b><h3>
+                    <p class="name">{{ item.email }} </p>
+                </h3></b>
+                <p>{{ item.subscribed_at }}</p>
+                <div class="bio">
+                    <h4>Bio</h4>
+                    <p>$20.000</p>
+                </div>
+		<div class="add-to-cart">
+        <input type="hidden" name="id" value="{{ item.id }}"/>
+        <input type="hidden" name="email" value="{{ item.email }}"/>		
+        <input type="text" class="product-quantity" name="cantidad" value="1" size="2" />
+        <input type="submit" value="Al Carro" class="default-btn" />
+        </div>
+
+				<div class="col-sm-1 col-md-1">
+					<a href="{{ url_for('.delete_product', id=item.id) }}" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-remove"></span>-</a>
+				</div>
+				</form>				
+            </div>
+        {% endfor %}  
+    </section>
+  </div>	
+	
+{% endblock %}
+
+  <footer>
+    <p>&copy; 2025 Mi Tienda de Tabaco. Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>
